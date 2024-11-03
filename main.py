@@ -12,17 +12,23 @@ canvas.place(width=1280, height=720, x=640, y=360, anchor="center")
 tkintertools.Text(canvas, (700, 200), text="计 算 器", fontsize=48, anchor="center")
 tkintertools.Text(canvas, (600, 240), text="算式", anchor="nw")
 entry = tkintertools.InputBox(canvas,position=(600,270))
-try:
-    with open(script_dir+"\settingjsq.json",'r') as f:
-        i = json.load(f)
-        if i["AutoAddDY"] == "True":
-            entry.set("1+")
-except FileNotFoundError:
-    messagebox.showerror("错误","未找到配置文件，请恢复配置文件")
-except json.decoder.JSONDecodeError:
-    messagebox.showerror("错误","配置文件格式错误，请恢复配置文件")
-except:
-    messagebox.showerror("错误","未知错误，请重新安装软件或提交Issue")
+def testread():
+    i = None
+    try:
+        with open(script_dir+"\settingjsq.json",'r') as f:
+            i = json.load(f)
+    except FileNotFoundError:
+        messagebox.showerror("错误","未找到配置文件，请恢复配置文件")
+    except json.decoder.JSONDecodeError:
+        messagebox.showerror("错误","配置文件格式错误，请恢复配置文件")
+    except:
+        messagebox.showerror("错误","未知错误，请重新安装软件或提交Issue")
+    return i
+config = testread()
+if config["AutoAddDY"] == "True":
+    Json_AddDy_molily = True
+else:
+    Json_AddDy_molily = False
 def change_state():
     var = entry.get()
     try:
@@ -38,7 +44,7 @@ def setting():
     canvas = tkintertools.Canvas(tl, zoom_item=True, keep_ratio="min", free_anchor=True)
     canvas.place(width=1280, height=720, x=640, y=360, anchor="center")
     tkintertools.Text(canvas, (20, 10), text="自动将输出的结果加上算式", anchor="nw")
-    tkintertools.Switch(canvas, (20, 40), command=orca,default=True)
+    tkintertools.Switch(canvas, (20, 40), command=orca,default=Json_AddDy_molily)
     tkintertools.Button(canvas, text="保存设置",position=(20, 80),command=save_setting)
     tl.mainloop()
 def orca(a):
