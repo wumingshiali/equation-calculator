@@ -29,9 +29,18 @@ if config["AutoAddDY"] == "True":
     Json_AddDy_molily = True
 else:
     Json_AddDy_molily = False
+if config["AutoDelDY"] == "True":
+    Json_DelDy_molily = True
+else:
+    Json_DelDy_molily = False
 def change_state():
     global Json_AddDy_molily
-    var = entry.get()
+    if Json_DelDy_molily == True:
+        var = entry.get()
+        if "=" in list(var):
+            var = var.replace("=","",1)
+    else:
+        var = entry.get()
     try:
         if Json_AddDy_molily == True:
             messagebox.showinfo("结果",str(var)+str(eval(var)))
@@ -49,7 +58,9 @@ def setting():
     canvas.place(width=1280, height=720, x=640, y=360, anchor="center")
     tkintertools.Text(canvas, (20, 10), text="自动将输出的结果加上算式", anchor="nw")
     tkintertools.Switch(canvas, (20, 40), command=orca,default=Json_AddDy_molily)
-    tkintertools.Button(canvas, text="保存设置",position=(20, 80),command=save_setting)
+    tkintertools.Text(canvas, (280, 10), text="自动将输入的结果删除=", anchor="nw")
+    tkintertools.Switch(canvas, (280, 40), command=ordd,default=Json_DelDy_molily)
+    tkintertools.Button(canvas, text="保存设置",position=(150, 80),command=save_setting)
     tl.mainloop()
 def orca(a):
     global f,i,script_dir
@@ -60,6 +71,22 @@ def orca(a):
                 i["AutoAddDY"] = "False"
             else:
                 i["AutoAddDY"] = "True"
+
+    except FileNotFoundError:
+        messagebox.showerror("错误","未找到配置文件，请恢复配置文件")
+    except json.decoder.JSONDecodeError:
+        messagebox.showerror("错误","配置文件格式错误，请恢复配置文件")
+    except:
+        messagebox.showerror("错误","未知错误，请重新安装软件")
+def ordd(a):
+    global f,i,script_dir
+    try:
+        with open(script_dir+"\settingjsq.json",'r') as f:
+            i = json.load(f)
+            if i["AutoDelDY"] == "True":
+                i["AutoDelDY"] = "False"
+            else:
+                i["AutoDelDY"] = "True"
 
     except FileNotFoundError:
         messagebox.showerror("错误","未找到配置文件，请恢复配置文件")
