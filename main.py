@@ -30,9 +30,13 @@ if config["AutoAddDY"] == "True":
 else:
     Json_AddDy_molily = False
 def change_state():
+    global Json_AddDy_molily
     var = entry.get()
     try:
-        messagebox.showinfo("结果",(eval(var)))
+        if Json_AddDy_molily == True:
+            messagebox.showinfo("结果",str(var)+str(eval(var)))
+        else:
+            messagebox.showinfo("结果",eval(var))
     except:
         messagebox.showerror("错误","算式错误")
     del var
@@ -67,6 +71,7 @@ def save_setting():
     global f,i
     with open(script_dir+"\settingjsq.json",'w') as f:
         json.dump(i,f,indent=4)
+    testread()
 button = tkintertools.Button(canvas,text='计算',command=change_state,position=(600,320))
 button = tkintertools.Button(canvas,text='设置',command=setting,position=(600,370))
 window.mainloop()
