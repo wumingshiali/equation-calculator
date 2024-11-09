@@ -1,38 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import tkintertools,os,json
-script_dir = os.path.abspath(__file__)
-script_dir = os.path.dirname(script_dir)
-window = tkintertools.Tk(title="计算器")
-window.alpha(0.995)
-window.center()
-window.iconbitmap(os.path.join(script_dir, 'logojsq.ico'))
-canvas = tkintertools.Canvas(window, zoom_item=True, keep_ratio="min", free_anchor=True)
-canvas.place(width=1280, height=720, x=640, y=360, anchor="center")
-tkintertools.Text(canvas, (700, 200), text="计 算 器", fontsize=48, anchor="center")
-tkintertools.Text(canvas, (600, 240), text="算式", anchor="nw")
-entry = tkintertools.InputBox(canvas,position=(600,270))
-def testread():
-    i = None
-    try:
-        with open(script_dir+"\settingjsq.json",'r') as f:
-            i = json.load(f)
-    except FileNotFoundError:
-        messagebox.showerror("错误","未找到配置文件，请恢复配置文件")
-    except json.decoder.JSONDecodeError:
-        messagebox.showerror("错误","配置文件格式错误，请恢复配置文件")
-    except:
-        messagebox.showerror("错误","未知错误，请重新安装软件或提交Issue")
-    return i
-config = testread()
-if config["AutoAddDY"] == "True":
-    Json_AddDy_molily = True
-else:
-    Json_AddDy_molily = False
-if config["AutoDelDY"] == "True":
-    Json_DelDy_molily = True
-else:
-    Json_DelDy_molily = False
+from simpleeval import simple_eval
 def change_state():
     global Json_AddDy_molily
     if Json_DelDy_molily == True:
@@ -43,12 +12,33 @@ def change_state():
         var = entry.get()
     try:
         if Json_AddDy_molily == True:
-            messagebox.showinfo("结果",str(var)+str(eval(var)))
+            messagebox.showinfo("结果",str(var)+str(simple_eval.eval(var)))
         else:
-            messagebox.showinfo("结果",eval(var))
+            messagebox.showinfo("结果",simple_eval.eval(var))
     except:
         messagebox.showerror("错误","算式错误")
-    del var
+    del var        
+def testread():
+    config = None
+    try:
+        with open(script_dir+"\settingjsq.json",'r') as f:
+            config = json.load(f)
+    except FileNotFoundError:
+        messagebox.showerror("错误","未找到配置文件，请恢复配置文件")
+    except json.decoder.JSONDecodeError:
+        messagebox.showerror("错误","配置文件格式错误，请恢复配置文件")
+    except:
+        messagebox.showerror("错误","未知错误，请重新安装软件或提交Issue")
+    config = testread()
+    if config["AutoAddDY"] == "True":
+        Json_AddDy_molily = True
+    else:
+        Json_AddDy_molily = False
+    if config["AutoDelDY"] == "True":
+        Json_DelDy_molily = True
+    else:
+        Json_DelDy_molily = False
+
 def setting():
     global icon_path
     tl = tkintertools.Toplevel(window,title="计算器")
@@ -99,6 +89,18 @@ def save_setting():
     with open(script_dir+"\settingjsq.json",'w') as f:
         json.dump(i,f,indent=4)
     testread()
-button = tkintertools.Button(canvas,text='计算',command=change_state,position=(600,320))
-button = tkintertools.Button(canvas,text='设置',command=setting,position=(600,370))
-window.mainloop()
+if __name__== "__main__":
+    script_dir = os.path.abspath(__file__)
+    script_dir = os.path.dirname(script_dir)
+    window = tkintertools.Tk(title="计算器")
+    window.alpha(0.995)
+    window.center()
+    window.iconbitmap(os.path.join(script_dir, 'logojsq.ico'))
+    canvas = tkintertools.Canvas(window, zoom_item=True, keep_ratio="min", free_anchor=True)
+    canvas.place(width=1280, height=720, x=640, y=360, anchor="center")
+    tkintertools.Text(canvas, (700, 200), text="计 算 器", fontsize=48, anchor="center")
+    tkintertools.Text(canvas, (600, 240), text="算式", anchor="nw")
+    entry = tkintertools.InputBox(canvas,position=(600,270))
+    button = tkintertools.Button(canvas,text='计算',command=change_state,position=(600,320))
+    button = tkintertools.Button(canvas,text='设置',command=setting,position=(600,370))
+    window.mainloop()
