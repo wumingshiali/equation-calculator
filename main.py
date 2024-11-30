@@ -43,7 +43,7 @@ def change_state():
         var = entry.get()
     try:
         if Json_AddDy_molily == True:
-            messagebox.showinfo("结果",str(var)+str(eval(var)))
+            messagebox.showinfo("结果",str(var) + "=" + str(eval(var)))
         else:
             messagebox.showinfo("结果",eval(var))
     except:
