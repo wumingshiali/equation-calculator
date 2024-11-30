@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import tkintertools,os,json
+from simpleeval import simple_eval
 script_dir = os.path.abspath(__file__)
 script_dir = os.path.dirname(script_dir)
 window = tkintertools.Tk(title="计算器")
@@ -43,7 +44,7 @@ def change_state():
         var = entry.get()
     try:
         if Json_AddDy_molily == True:
-            messagebox.showinfo("结果",str(var) + "=" + str(eval(var)))
+            messagebox.showinfo("结果",str(var) + "=" + str(simple_eval(var)))
         else:
             messagebox.showinfo("结果",eval(var))
     except:
