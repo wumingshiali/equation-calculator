@@ -2,7 +2,7 @@
 
 ---
 
-需要`pip install tkintertools[all]==3.0.0rc3`和`pip install tkintertools[extension]==3.0.0rc3`和`pip install json`和`pip install simpleeval`
+需要`pip install tkintertools[all]==3.0.0rc4`和`pip install tkintertools[extension]==3.0.0rc4`和`pip install json`和`pip install simpleeval`
 
 ---
 

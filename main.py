@@ -4,27 +4,18 @@ import tkintertools,os,json
 from simpleeval import simple_eval
 script_dir = os.path.abspath(__file__)
 script_dir = os.path.dirname(script_dir)
-window = tkintertools.Tk(title="计算器")
-window.alpha(0.995)
-window.center()
-window.iconbitmap(os.path.join(script_dir, 'logojsq.ico'))
-canvas = tkintertools.Canvas(window, zoom_item=True, keep_ratio="min", free_anchor=True)
-canvas.place(width=1280, height=720, x=640, y=360, anchor="center")
-tkintertools.Text(canvas, (700, 200), text="计 算 器", fontsize=48, anchor="center")
-tkintertools.Text(canvas, (600, 240), text="算式", anchor="nw")
-entry = tkintertools.InputBox(canvas,position=(600,270))
 def testread():
-    i = None
+    global i
     try:
-        with open(script_dir+"\settingjsq.json",'r') as f:
+        with open(script_dir + "\settingjsq.json",'r') as f:
             i = json.load(f)
+            return i
     except FileNotFoundError:
         messagebox.showerror("错误","未找到配置文件，请恢复配置文件")
     except json.decoder.JSONDecodeError:
         messagebox.showerror("错误","配置文件格式错误，请恢复配置文件")
     except:
         messagebox.showerror("错误","未知错误，请重新安装软件或提交Issue")
-    return i
 config = testread()
 if config["AutoAddDY"] == "True":
     Json_AddDy_molily = True
@@ -34,6 +25,15 @@ if config["AutoDelDY"] == "True":
     Json_DelDy_molily = True
 else:
     Json_DelDy_molily = False
+window = tkintertools.Tk(title="计算器")
+window.alpha(config["BTMd"])
+window.center()
+window.iconbitmap(os.path.join(script_dir, 'logojsq.ico'))
+canvas = tkintertools.Canvas(window, zoom_item=True, keep_ratio="min", free_anchor=True)
+canvas.place(width=1280, height=720, x=640, y=360, anchor="center")
+tkintertools.Text(canvas, (700, 200), text="计 算 器", fontsize=48, anchor="center")
+tkintertools.Text(canvas, (600, 240), text="算式", anchor="nw")
+entry = tkintertools.InputBox(canvas,position=(600,270))
 def change_state():
     global Json_AddDy_molily
     if Json_DelDy_molily == True:
@@ -51,9 +51,9 @@ def change_state():
         messagebox.showerror("错误","算式错误")
     del var
 def setting():
-    global icon_path
+    global Json_AddDy_molily,Json_DelDy_molily,i,icon_path
     tl = tkintertools.Toplevel(window,title="计算器")
-    window.alpha(0.995)
+    window.alpha(config["BTMd"])
     window.iconbitmap(os.path.join(script_dir, 'logojsq.ico'))
     canvas = tkintertools.Canvas(tl, zoom_item=True, keep_ratio="min", free_anchor=True)
     canvas.place(width=1280, height=720, x=640, y=360, anchor="center")
@@ -61,7 +61,10 @@ def setting():
     tkintertools.Switch(canvas, (20, 40), command=orca,default=Json_AddDy_molily)
     tkintertools.Text(canvas, (280, 10), text="自动将输入的结果删除=", anchor="nw")
     tkintertools.Switch(canvas, (280, 40), command=ordd,default=Json_DelDy_molily)
-    tkintertools.Button(canvas, text="保存设置",position=(150, 80),command=save_setting)
+    tkintertools.Text(canvas, (20, 80),text=("不透明度"))
+    tkintertools.Slider(canvas, (20, 100), default=config["BTMd"], command=btms)
+    tkintertools.Text(canvas, (20, 130),text=i["BTMd"])
+    tkintertools.Button(canvas, text="保存设置",position=(150, 140),command=save_setting)
     tl.mainloop()
 def orca(a):
     global f,i,script_dir
@@ -88,6 +91,21 @@ def ordd(a):
                 i["AutoDelDY"] = "False"
             else:
                 i["AutoDelDY"] = "True"
+
+    except FileNotFoundError:
+        messagebox.showerror("错误","未找到配置文件，请恢复配置文件")
+    except json.decoder.JSONDecodeError:
+        messagebox.showerror("错误","配置文件格式错误，请恢复配置文件")
+    except:
+        messagebox.showerror("错误","未知错误，请重新安装软件")
+def btms(b):
+    global f,i,script_dir
+    if b < 0.4:
+        messagebox.showinfo("禁止操作","不透明度不能小于0.4")
+    try:
+        with open(script_dir+"\settingjsq.json",'r') as f:
+            i = json.load(f)
+            i["BTMd"] = b
 
     except FileNotFoundError:
         messagebox.showerror("错误","未找到配置文件，请恢复配置文件")
