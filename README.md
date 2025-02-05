@@ -2,13 +2,13 @@
 
 ---
 
-需要`pip install tkintertools[all]==3.0.0rc4`和`pip install tkintertools[extension]==3.0.0rc4`和`pip install json`和`pip install simpleeval`
+需要`pip install maliang[opt]`和`pip install maliang[ext]`和`pip install json`和`pip install simpleeval`
 
 ---
 
 ## 实现原理
 
-> 运用Python中的eval()函数，使用[tkinkertools](https://github.com/Xiaokang2022/tkintertools)制作GUI，欢迎Fork！
+> 运用Python中的eval()函数，使用[tkinkertools](https://github.com/Xiaokang2022/maliang)制作GUI，欢迎Fork！
 
 ---
 
