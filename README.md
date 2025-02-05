@@ -8,7 +8,7 @@
 
 ## 实现原理
 
-> 运用Python中的eval()函数，使用[tkinkertools](https://github.com/Xiaokang2022/maliang)制作GUI，欢迎Fork！
+> 运用Python中的eval()函数，使用[maliang](https://github.com/Xiaokang2022/maliang)制作GUI，欢迎Fork！
 
 ---
 
