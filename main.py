@@ -5,6 +5,7 @@ from simpleeval import simple_eval
 from azure.ai.inference import ChatCompletionsClient
 from azure.ai.inference.models import SystemMessage, UserMessage
 from azure.core.credentials import AzureKeyCredential
+import keyboard
 script_dir = os.path.abspath(__file__)
 script_dir = os.path.dirname(script_dir)
 def testread():
@@ -55,7 +56,7 @@ def show():
         messagebox.showerror("错误","算式错误")
     del var
 def setting():
-    global Json_AddDy_default,Json_DelDy_default,i,icon_path,text_bmd
+    global Json_AddDy_default,Json_DelDy_default,i,icon_path
     tl = maliang.Toplevel(window,title="设置")
     tl.alpha(config["BTMd"])
     tl.iconbitmap(os.path.join(script_dir, 'logojsq.ico'))
@@ -67,12 +68,12 @@ def setting():
     maliang.Switch(canvas, (280, 40), command=ordd,default=Json_DelDy_default)
     maliang.Text(canvas, (20, 80),text=("不透明度"))
     maliang.Slider(canvas, (20, 100), default=config["BTMd"], command=btms)
-    text_bmd = maliang.Text(canvas, (20, 130), text=str(round(config["BTMd"], 2)))
+    maliang.Text(canvas, (20, 130), text=str(round(config["BTMd"], 2)))
     maliang.Button(canvas, text="保存设置",position=(150, 140),command=save_setting)
 def orca(a):
     global f,i,script_dir
     try:
-        with open(script_dir+"\settingjsq.json",'r') as f:
+        with open(f"{script_dir}+/settingjsq.json",'r') as f:
             i = json.load(f)
             if i["AutoAddDY"] == "True":
                 i["AutoAddDY"] = "False"
@@ -88,7 +89,7 @@ def orca(a):
 def ordd(a):
     global f,i,script_dir
     try:
-        with open(script_dir+"\settingjsq.json",'r') as f:
+        with open(f"{script_dir}+/settingjsq.json",'r') as f:
             i = json.load(f)
             if i["AutoDelDY"] == "True":
                 i["AutoDelDY"] = "False"
@@ -102,11 +103,11 @@ def ordd(a):
     except:
         messagebox.showerror("错误","未知错误，请重新安装软件")
 def btms(b):
-    global f,i,script_dir,text_bmd
+    global f,i,script_dir
     if b < 0.4:
         messagebox.showinfo("禁止操作","不透明度不能小于0.4")
     try:
-        with open(script_dir+"\settingjsq.json",'r') as f:
+        with open(f"{script_dir}+/settingjsq.json",'r') as f:
             i = json.load(f)
             i["BTMd"] = b
 
@@ -118,7 +119,7 @@ def btms(b):
         messagebox.showerror("错误","未知错误，请重新安装软件")
 def save_setting():
     global f,i
-    with open(script_dir+"\settingjsq.json",'w') as f:
+    with open(f"{script_dir}+/settingjsq.json",'w') as f:
         json.dump(i,f,indent=4)
     testread()
 def askai():
@@ -150,4 +151,6 @@ def askai():
 button = maliang.Button(canvas,text='计算',command=show,position=(600,320))
 button = maliang.Button(canvas,text='设置',command=setting,position=(600,370))
 button = maliang.Button(canvas,text='问AI',command=askai,position=(680,320))
+keyboard.hook(lambda e: show() if e.name == 'enter' else None)
+keyboard.add_hotkey('enter+a', lambda: askai())
 window.mainloop()
