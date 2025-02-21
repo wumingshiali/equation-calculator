@@ -6,10 +6,13 @@ from azure.ai.inference import ChatCompletionsClient
 from azure.ai.inference.models import SystemMessage, UserMessage
 from azure.core.credentials import AzureKeyCredential
 import keyboard
+import sys
 
-script_dir = os.path.abspath(__file__)
-script_dir = os.path.dirname(script_dir)
-print(os.getcwd())
+if getattr(sys, 'frozen', False):
+    script_dir = os.getcwd()
+else:
+    script_dir = os.path.abspath(__file__)
+    script_dir = os.path.dirname(script_dir)
 
 def testread():
     global i
