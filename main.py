@@ -7,6 +7,10 @@ from azure.ai.inference.models import SystemMessage, UserMessage
 from azure.core.credentials import AzureKeyCredential
 import keyboard
 
+script_dir = os.path.abspath(__file__)
+script_dir = os.path.dirname(script_dir)
+print(os.getcwd())
+
 def testread():
     global i
     try:
@@ -33,7 +37,7 @@ def show():
         if Json_AddDy_default == True:
             messagebox.showinfo("结果",str(var) + "=" + str(simple_eval(var)))
         else:
-            messagebox.showinfo("结果",eval(var))
+            messagebox.showinfo("结果",simple_eval(var))
     except:
         messagebox.showerror("错误","算式错误")
     del var
@@ -120,7 +124,7 @@ def askai():
     client = ChatCompletionsClient(
         endpoint=endpoint,
         credential=AzureKeyCredential(token),
-        # connection_verify=False
+        connection_verify=False
     )
 
     response = client.complete(
@@ -148,8 +152,6 @@ if config["AutoDelDY"] == "True":
 else:
     Json_DelDy_default = False
 
-script_dir = os.path.abspath(__file__)
-script_dir = os.path.dirname(script_dir)
 window = maliang.Tk(title="计算器")
 window.alpha(config["BTMd"])
 window.center()
@@ -163,5 +165,4 @@ button = maliang.Button(canvas,text='计算',command=show,position=(600,320))
 button = maliang.Button(canvas,text='设置',command=setting,position=(600,370))
 button = maliang.Button(canvas,text='问AI',command=askai,position=(680,320))
 keyboard.hook(lambda e: show() if e.name == 'enter' else None)
-keyboard.add_hotkey('enter+a', lambda: askai())
 window.mainloop()
