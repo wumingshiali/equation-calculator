@@ -2,7 +2,7 @@
 
 ---
 
-需要`pip install maliang[opt]`和`pip install maliang[ext]`和`pip install json`和`pip install simpleeval`和`pip install azure-ai-inference`和`pip install keyboard`如果想使用AI功能，你需要在环境变量中的GITHUB_TOKEN中写入你的令牌（Github个人访问令牌，Azure AI令牌）
+需要`pip install maliang[opt]`和`pip install maliang[ext]`和`pip install json`和`pip install simpleeval`和`pip install azure-ai-inference`和`pip install keyboard`
 
 ---
 
