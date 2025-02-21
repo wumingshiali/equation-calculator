@@ -6,8 +6,7 @@ from azure.ai.inference import ChatCompletionsClient
 from azure.ai.inference.models import SystemMessage, UserMessage
 from azure.core.credentials import AzureKeyCredential
 import keyboard
-script_dir = os.path.abspath(__file__)
-script_dir = os.path.dirname(script_dir)
+
 def testread():
     global i
     try:
@@ -21,24 +20,7 @@ def testread():
         messagebox.showerror("错误","配置文件格式错误，请恢复配置文件")
     except:
         messagebox.showerror("错误","未知错误，请重新安装软件或提交Issue")
-config = testread()
-if config["AutoAddDY"] == "True":
-    Json_AddDy_default = True
-else:
-    Json_AddDy_default = False
-if config["AutoDelDY"] == "True":
-    Json_DelDy_default = True
-else:
-    Json_DelDy_default = False
-window = maliang.Tk(title="计算器")
-window.alpha(config["BTMd"])
-window.center()
-window.iconbitmap(os.path.join(script_dir, 'logojsq.ico'))
-canvas = maliang.Canvas(window, keep_ratio="min", free_anchor=True)
-canvas.place(width=1280, height=720, x=640, y=360, anchor="center")
-maliang.Text(canvas, (700, 200), text="计 算 器", fontsize=48, anchor="center")
-maliang.Text(canvas, (600, 240), text="算式", anchor="nw")
-entry = maliang.InputBox(canvas,position=(600,270))
+
 def show():
     global Json_AddDy_default
     if Json_DelDy_default == True:
@@ -55,6 +37,7 @@ def show():
     except:
         messagebox.showerror("错误","算式错误")
     del var
+
 def setting():
     global Json_AddDy_default,Json_DelDy_default,i,icon_path
     tl = maliang.Toplevel(window,title="设置")
@@ -70,6 +53,7 @@ def setting():
     maliang.Slider(canvas, (20, 100), default=config["BTMd"], command=btms)
     maliang.Text(canvas, (20, 130), text=str(round(config["BTMd"], 2)))
     maliang.Button(canvas, text="保存设置",position=(150, 140),command=save_setting)
+
 def orca(a):
     global f,i,script_dir
     try:
@@ -86,6 +70,7 @@ def orca(a):
         messagebox.showerror("错误","配置文件格式错误，请恢复配置文件")
     except:
         messagebox.showerror("错误","未知错误，请重新安装软件")
+
 def ordd(a):
     global f,i,script_dir
     try:
@@ -102,6 +87,7 @@ def ordd(a):
         messagebox.showerror("错误","配置文件格式错误，请恢复配置文件")
     except:
         messagebox.showerror("错误","未知错误，请重新安装软件")
+
 def btms(b):
     global f,i,script_dir
     if b < 0.4:
@@ -117,27 +103,30 @@ def btms(b):
         messagebox.showerror("错误","配置文件格式错误，请恢复配置文件")
     except:
         messagebox.showerror("错误","未知错误，请重新安装软件")
+
 def save_setting():
     global f,i
     with open(f"{script_dir}+/settingjsq.json",'w') as f:
         json.dump(i,f,indent=4)
     testread()
+
 def askai():
     global entry
     timu = str(entry.get())
     endpoint = "https://models.inference.ai.azure.com"
     model_name = "DeepSeek-R1"
-    token = os.environ["GITHUB_TOKEN"]
+    token = "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"    # os.environ["GITHUB_TOKEN"]
 
     client = ChatCompletionsClient(
         endpoint=endpoint,
         credential=AzureKeyCredential(token),
-        connection_verify=False
+        # connection_verify=False
     )
 
     response = client.complete(
         messages=[
-            UserMessage("用户发来了一道数学题，它是"+timu+"，请给出逐步思考过程，像一个老师一样教会用户，请不要把这些对你的要求出现在回答中，请不要使用markdown格式，只能纯文本"),
+            SystemMessage("你是一个数学老师，你需要帮助用户解决数学题，并且给出逐步思考过程，并且不要在回答中包含对你的要求，不要在回答中包含markdown格式，不要在回答中包含你的要求"),
+            UserMessage("用户发来了一道数学题，它是"+timu),
         ],
         max_tokens=1000,
         model=model_name
@@ -148,6 +137,28 @@ def askai():
     canvas = maliang.Canvas(tl, keep_ratio="min", free_anchor=True)
     canvas.place(width=1280, height=720, x=640, y=360, anchor="center")
     maliang.Text(canvas, (20, 10), text=response.choices[0].message.content)
+
+config = testread()
+if config["AutoAddDY"] == "True":
+    Json_AddDy_default = True
+else:
+    Json_AddDy_default = False
+if config["AutoDelDY"] == "True":
+    Json_DelDy_default = True
+else:
+    Json_DelDy_default = False
+
+script_dir = os.path.abspath(__file__)
+script_dir = os.path.dirname(script_dir)
+window = maliang.Tk(title="计算器")
+window.alpha(config["BTMd"])
+window.center()
+window.iconbitmap(os.path.join(script_dir, 'logojsq.ico'))
+canvas = maliang.Canvas(window, keep_ratio="min", free_anchor=True)
+canvas.place(width=1280, height=720, x=640, y=360, anchor="center")
+maliang.Text(canvas, (700, 200), text="计 算 器", fontsize=48, anchor="center")
+maliang.Text(canvas, (600, 240), text="算式", anchor="nw")
+entry = maliang.InputBox(canvas,position=(600,270))
 button = maliang.Button(canvas,text='计算',command=show,position=(600,320))
 button = maliang.Button(canvas,text='设置',command=setting,position=(600,370))
 button = maliang.Button(canvas,text='问AI',command=askai,position=(680,320))
