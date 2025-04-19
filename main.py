@@ -7,8 +7,10 @@ from azure.ai.inference.models import SystemMessage, UserMessage
 from azure.core.credentials import AzureKeyCredential
 import keyboard
 import sys
-from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLineEdit, QPushButton, QTextEdit, QSlider, QLabel, QMessageBox, QCheckBox, QDialog
-from PyQt6.QtCore import Qt
+from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLineEdit, QPushButton, QTextEdit, QSlider, QLabel, QMessageBox, QCheckBox, QDialog
+from PySide6.QtGui import QFont,QIcon
+from PySide6.QtCore import Qt
+from openai import OpenAI
 
 if getattr(sys, 'frozen', False):
     script_dir = os.getcwd()
@@ -103,38 +105,63 @@ def save_setting():
         json.dump(i,f,indent=4)
     testread()
 
-def askai():
-    timu = str(entry.get())
-    endpoint = "https://models.inference.ai.azure.com"
-    model_name = "DeepSeek-R1"
-    token = "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"  # os.environ["GITHUB_TOKEN"]
+def askai(self):
+    timu = self.entry.text()
+    api_key = config.get("OPENROUTER_API_KEY")  # 从配置文件中读取 API Key
+    if not api_key:
+        QMessageBox.warning(self, "错误", "未找到有效的 API Key，请检查配置文件")
+        return
 
-    client = ChatCompletionsClient(
-        endpoint=endpoint,
-        credential=AzureKeyCredential(token),
-        connection_verify=False
-    )
-
-    response = client.complete(
-        messages=[
-            SystemMessage("你是一个数学老师，你需要帮助用户解决数学题，并且给出逐步思考过程，并且不要在回答中包含对你的要求，不要在回答中包含```,不要在回答中包含你的要求"),
-            UserMessage("用户发来了一道数学题，它是" + timu),
-        ],
-        max_tokens=1000,
-        model=model_name
+    client = OpenAI(
+        base_url="https://openrouter.ai/api/v1",
+        api_key=api_key,  # 使用从配置文件中读取的 API Key
     )
 
     ai_window = QDialog()
     ai_window.setWindowTitle("问AI")
-    ai_window.setWindowOpacity(float(config["BTMd"]))  # 设置窗口透明度
+    ai_window.setWindowOpacity(float(config["BTMd"]))
     ai_window.setWindowIcon(QIcon(os.path.join(script_dir, 'logojsq.ico')))
 
     layout = QVBoxLayout()
     result_text = QTextEdit()
     result_text.setReadOnly(True)
-    result_text.setText(response.choices[0].message.content)
     layout.addWidget(result_text)
     ai_window.setLayout(layout)
+
+    def update_result(content):
+        current_text = result_text.toPlainText()
+        result_text.setText(current_text + content)
+
+    try:
+        stream = client.chat.completions.create(
+            extra_headers={
+                "HTTP-Referer": "https://xn--eqrr82bzpe.top/ecalculator/",  # Optional. Site URL for rankings on openrouter.ai.
+                "X-Title": "算式计算器",  # Optional. Site title for rankings on openrouter.ai.
+            },
+            extra_body={},
+            model="google/gemini-2.5-pro-exp-03-25:free",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "你是一个数学老师，你需要帮助用户解决数学题，并且给出逐步思考过程"
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": f"用户发来了一道数学题，它是{timu}"
+                        }
+                    ]
+                }
+            ],
+            stream=True,
+        )
+        for chunk in stream:
+            if chunk.choices[0].delta.content:
+                update_result(chunk.choices[0].delta.content)
+    except Exception as e:
+        QMessageBox.warning(self, "错误", f"AI 响应失败: {str(e)}")
 
     ai_window.exec()
 
@@ -153,9 +180,8 @@ class CalculatorApp(QMainWindow):
     def __init__(self):
         super().__init__()
         # 设置全局字体为微软雅黑
-        from PyQt6.QtGui import QFont
         font = QFont("Microsoft YaHei", 10)
-        QApplication.setFont(font)
+        QApplication.instance().setFont(font)  # PySide6 使用 QApplication.instance() 设置字体
         self.setWindowTitle("计算器")
         self.setGeometry(100, 100, 350, 400)  # 修改窗口尺寸
 
@@ -208,25 +234,42 @@ class CalculatorApp(QMainWindow):
 
     def askai(self):
         timu = self.entry.text()
-        endpoint = "https://models.inference.ai.azure.com"
-        model_name = "DeepSeek-R1"
-        token = "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"  # os.environ["GITHUB_TOKEN"]
-
-        client = ChatCompletionsClient(
-            endpoint=endpoint,
-            credential=AzureKeyCredential(token),
-            connection_verify=False
+        client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key="<OPENROUTER_API_KEY>",  # 替换为实际 API Key
         )
 
-        response = client.complete(
-            messages=[
-                SystemMessage("你是一个数学老师，你需要帮助用户解决数学题，并且给出逐步思考过程"),
-                UserMessage(f"用户发来了一道数学题，它是{timu}"),
-            ],
-            max_tokens=1000,
-            model=model_name
-        )
-        self.result_display.setText(response.choices[0].message.content)
+        ai_window = QDialog()
+        ai_window.setWindowTitle("问AI")
+        ai_window.setWindowOpacity(float(config["BTMd"]))  # 设置窗口透明度
+        ai_window.setWindowIcon(QIcon(os.path.join(script_dir, 'logojsq.ico')))
+
+        layout = QVBoxLayout()
+        result_text = QTextEdit()
+        result_text.setReadOnly(True)
+        layout.addWidget(result_text)
+        ai_window.setLayout(layout)
+
+        def update_result(content):
+            current_text = result_text.toPlainText()
+            result_text.setText(current_text + content)
+
+        try:
+            stream = client.chat.completions.create(
+                model="google/gemini-2.5-pro-exp-03-25:free",
+                messages=[
+                    {"role": "system", "content": "你是一个数学老师，你需要帮助用户解决数学题，并且给出逐步思考过程"},
+                    {"role": "user", "content": f"用户发来了一道数学题，它是{timu}"},
+                ],
+                stream=True,
+            )
+            for chunk in stream:
+                if chunk.choices[0].delta.content:
+                    update_result(chunk.choices[0].delta.content)
+        except Exception as e:
+            QMessageBox.warning(self, "错误", f"AI 响应失败: {str(e)}")
+
+        ai_window.exec()
 
 
 class SettingsWindow(QDialog):  # 修改父类为 QDialog
